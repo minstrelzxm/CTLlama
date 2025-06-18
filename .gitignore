@@ -1,0 +1,3 @@
+# Ignore raw or generated data
+data/
+inference.ipynb
