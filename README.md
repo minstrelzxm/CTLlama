@@ -27,8 +27,8 @@
 ## 🎯 Features
 
 - **Domain adaptation**: Built on LLaMA-3.1-8B, specialized for clinical trial data and PubMed abstracts.  
-- **Efficient fine-tuning**: Uses LoRA adapters for lightweight SFT and RL stages.  
-- **Stable outputs**: GRPO-based reinforcement learning to enforce consistent XML/CoT formatting.  
+- **Efficient fine-tuning**: Uses LoRA adapters for lightweight CPT, SFT and RL stages.  
+- **Stable outputs**: GRPO-based reinforcement learning to enforce consistent XML/CoT formatting in general domains.  
 - **Extensible**: Modular codebase with clear separation of setup, training, and utilities.
 
 ---
