@@ -13,15 +13,17 @@ def main():
     tokenized_ds = setup.prepare_dataset()
 
     # 2) Train CPT with LoRA adapters
+    # Effective batch = per_device_batch_size * grad_accum * num_gpus.
+    # Example: 2 * 8 * 8 = 128 (matches README).
     trainer = CPTTrainer(
         model=setup.model,
         tokenizer=setup.tokenizer,
         train_dataset=tokenized_ds,
         output_dir="cpt_output",
-        per_device_batch_size=16,
+        per_device_batch_size=2,
+        gradient_accumulation_steps=8,
         learning_rate=5e-5,
         num_train_epochs=3,
-        mlm_probability=0.15
     )
     trainer.train()
 

@@ -53,10 +53,10 @@ CTLlama is trained in **three sequential stages** to maximize performance and st
 ### 1. Continual Pre-Training (CPT)
 
 - **Data**: ~100 M tokens from ClinicalTrials.gov and PubMed abstracts  
-- **Objective**: Masked-language modeling to refine domain vocabulary and syntax  
+- **Objective**: Causal (autoregressive) language modeling to refine domain vocabulary and syntax  
 - **Configuration**:  
   - Learning rate: 5 × 10⁻⁵  
-  - Batch size: 128; sequence length: 4 096 
+  - Effective batch size: 128 (per-device 2 × grad-accum 8 × 8 GPUs); sequence length: 4 096
 
 ### 2. Supervised Fine-Tuning (SFT)
 

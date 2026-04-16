@@ -1,7 +1,8 @@
 import wandb
 import torch
 from unsloth import FastLanguageModel, is_bfloat16_supported
-from transformers import TrainingArguments, DataCollatorForLanguageModeling
+from transformers import TrainingArguments
+from trl import DataCollatorForCompletionOnlyLM
 from datasets import load_dataset
 from utils import formatting_prompts_func, tokenize_function
 
@@ -38,7 +39,13 @@ class Setup:
         )
         # Tokenizer setup
         tokenizer.padding_side = "right"
-        tokenizer.pad_token_id = 128004
+        if tokenizer.pad_token is None:
+            # LLaMA-3 ships a dedicated right-pad token; fall back to eos if missing.
+            pad_token = "<|finetune_right_pad_id|>"
+            if pad_token in tokenizer.get_vocab():
+                tokenizer.pad_token = pad_token
+            else:
+                tokenizer.pad_token = tokenizer.eos_token
         tokenizer.add_special_tokens({
             "additional_special_tokens": ['<begin_of_ref>', '<end_of_ref>','<think>','</think>', '<answer>', '</answer>']
         })
@@ -55,13 +62,17 @@ class Setup:
     def prepare_data(self, tokenizer):
         # Load and format
         dataset = load_dataset("json", data_files=self.data_path, split="train")
-        dataset = dataset.map(lambda ex: formatting_prompts_func(ex, tokenizer), batched=True)
-        # Tokenize
+        dataset = dataset.map(
+            lambda ex: formatting_prompts_func(ex, tokenizer),
+            batched=True,
+            remove_columns=dataset.column_names,
+        )
+        # Tokenize (no padding — collator handles it per-batch)
         tokenized = dataset.map(
             lambda ex: tokenize_function(ex, tokenizer, self.max_seq_length),
-            batched=True
+            batched=True,
+            remove_columns=["text"],
         )
-        tokenized.set_format(type="torch", columns=["input_ids", "attention_mask"])
         return tokenized
 
     def get_training_args(self, output_dir: str = "output", **kwargs):
@@ -71,7 +82,11 @@ class Setup:
         )
 
     def get_data_collator(self, tokenizer):
-        return DataCollatorForLanguageModeling(
+        # Response-only loss: labels are -100 for everything up to and
+        # including the assistant-header, so only the response tokens
+        # contribute to the SFT loss.
+        response_template = "<|start_header_id|>assistant<|end_header_id|>\n\n"
+        return DataCollatorForCompletionOnlyLM(
+            response_template=response_template,
             tokenizer=tokenizer,
-            mlm=False
         )

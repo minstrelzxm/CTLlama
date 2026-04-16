@@ -39,10 +39,18 @@ def correctness_reward_func(prompts, completions, answer, **kwargs) -> list[floa
     extracted = [extract_xml_answer(r) for r in responses]
     return [2.0 if r == a else 0.0 for r, a in zip(extracted, answer)]
 
+def _is_numeric(s: str) -> bool:
+    # GSM8K answers can be negative, decimal, or comma-formatted.
+    try:
+        float(s.replace(",", ""))
+        return True
+    except ValueError:
+        return False
+
 def int_reward_func(completions, **kwargs) -> list[float]:
     responses = [c[0]["content"] for c in completions]
     extracted = [extract_xml_answer(r) for r in responses]
-    return [0.5 if r.isdigit() else 0.0 for r in extracted]
+    return [0.5 if _is_numeric(r) else 0.0 for r in extracted]
 
 def strict_format_reward_func(completions, **kwargs) -> list[float]:
     pattern = r"^<think>\n.*?\n</think>\n<answer>\n.*?\n</answer>\n$"

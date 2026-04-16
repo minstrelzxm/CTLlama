@@ -1,4 +1,5 @@
 import os
+import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model, TaskType
@@ -27,13 +28,18 @@ class SetupCPT:
         # default target modules if not provided
         if lora_target_modules is None:
             lora_target_modules = [
-            "q_proj", "k_proj", "v_proj", "o_proj",
-            "gate_proj", "up_proj", "down_proj",
-        ],
+                "q_proj", "k_proj", "v_proj", "o_proj",
+                "gate_proj", "up_proj", "down_proj",
+            ]
 
         # load base model & tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name)
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            torch_dtype=torch.bfloat16,
+        )
 
         # apply LoRA adapters for CPT
         peft_config = LoraConfig(

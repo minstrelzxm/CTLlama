@@ -25,3 +25,4 @@ class RLTrainer:
 
     def save(self, output_dir: str = "grpo_saved_lora"):
         self.model.save_lora(output_dir)
+        self.tokenizer.save_pretrained(output_dir)

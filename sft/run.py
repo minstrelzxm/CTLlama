@@ -1,3 +1,5 @@
+import os
+
 from setup import Setup
 from train import ModelTrainer
 from unsloth import FastLanguageModel, is_bfloat16_supported
@@ -6,7 +8,7 @@ from unsloth import FastLanguageModel, is_bfloat16_supported
 def main():
     # Setup configuration
     peft_cfg = {
-        'r': 16,
+        'r': 32,
         'target_modules': [
             "q_proj", "k_proj", "v_proj", "o_proj",
             "gate_proj", "up_proj", "down_proj",
@@ -22,7 +24,7 @@ def main():
     }
     setup = Setup(
         model_name="minstrelzxm/ctllama-8b-base",
-        token="your_only_token_here",
+        token=os.environ["HF_TOKEN"],
         peft_config=peft_cfg
     )
     setup.login()

@@ -7,10 +7,10 @@ class CPTTrainer:
         tokenizer,
         train_dataset,
         output_dir: str = "cpt_output",
-        per_device_batch_size: int = 16,
+        per_device_batch_size: int = 2,
+        gradient_accumulation_steps: int = 8,
         learning_rate: float = 5e-5,
         num_train_epochs: int = 3,
-        mlm_probability: float = 0.15,
     ):
         """
         model, tokenizer: from SetupCPT (with LoRA)
@@ -19,21 +19,23 @@ class CPTTrainer:
         self.model = model
         self.tokenizer = tokenizer
 
+        # Causal LM: next-token prediction, not masked LM.
         self.data_collator = DataCollatorForLanguageModeling(
             tokenizer=tokenizer,
-            mlm=True,
-            mlm_probability=mlm_probability,
+            mlm=False,
         )
 
         self.args = TrainingArguments(
             output_dir=output_dir,
             per_device_train_batch_size=per_device_batch_size,
+            gradient_accumulation_steps=gradient_accumulation_steps,
             learning_rate=learning_rate,
             num_train_epochs=num_train_epochs,
             logging_steps=100,
             save_steps=500,
             save_total_limit=2,
-            fp16=True,
+            bf16=True,
+            gradient_checkpointing=True,
             remove_unused_columns=False,
         )
 

@@ -1,7 +1,7 @@
 import wandb
 from unsloth import FastLanguageModel
 from datasets import load_dataset, Dataset
-from utils_rl import get_gsm8k_questions
+from utils import get_gsm8k_questions
 from trl import GRPOConfig
 
 class RLSetup:
@@ -48,6 +48,7 @@ class RLSetup:
         return get_gsm8k_questions(split=split)
 
     def get_training_config(self, **kwargs) -> GRPOConfig:
+        output_dir = kwargs.pop('output_dir', 'output/grpo')
         return GRPOConfig(
             learning_rate=5e-6,
             adam_beta1=0.9,
@@ -67,7 +68,7 @@ class RLSetup:
             save_total_limit=5,
             max_grad_norm=0.1,
             report_to="wandb",
-            output_dir=kwargs.get('output_dir', 'output/grpo'),
+            output_dir=output_dir,
             skip_special_tokens=False,
             **kwargs
         )

@@ -1,3 +1,5 @@
+import os
+
 from setup import RLSetup
 from train import RLTrainer
 from utils import (
@@ -12,14 +14,14 @@ def main():
         'target_modules': [
             "q_proj", "k_proj", "v_proj", "o_proj",
             "gate_proj", "up_proj", "down_proj",
-            "emb_tokens", "lm_head"
+            "embed_tokens", "lm_head"
         ],
         'use_gradient_checkpointing': 'unsloth',
         'random_state': 3407
     }
     setup = RLSetup(
         model_name="minstrelzxm/CTLlama-8b-instruct-distill",
-        token="your_only_token_here",
+        token=os.environ["HF_TOKEN"],
         peft_config=peft_cfg
     )
     setup.login()

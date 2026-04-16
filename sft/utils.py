@@ -19,9 +19,10 @@ def formatting_prompts_func(examples, tokenizer):
 
 
 def tokenize_function(examples, tokenizer, max_seq_length):
+    # No padding here — the data collator pads per-batch to the longest
+    # sample. Padding to max_seq_length every example wastes memory.
     return tokenizer(
         examples["text"],
         truncation=True,
-        padding="max_length",
-        max_length=max_seq_length
+        max_length=max_seq_length,
     )
