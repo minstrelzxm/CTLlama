@@ -1,6 +1,6 @@
 import wandb
 from unsloth import FastLanguageModel
-from datasets import load_dataset, Dataset
+from datasets import Dataset
 from utils import get_gsm8k_questions
 from trl import GRPOConfig
 

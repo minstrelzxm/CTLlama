@@ -3,7 +3,6 @@ import os
 from setup import RLSetup
 from train import RLTrainer
 from utils import (
-    extract_xml_answer, extract_hash_answer,
     correctness_reward_func, int_reward_func,
     strict_format_reward_func, soft_format_reward_func,
     xmlcount_reward_func
@@ -36,7 +35,7 @@ def main():
         correctness_reward_func
     ]
     trainer = RLTrainer(model, tokenizer, dataset, reward_funcs, config)
-    stats = trainer.train()
+    trainer.train()
     trainer.save()
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ import os
 
 from setup import Setup
 from train import ModelTrainer
-from unsloth import FastLanguageModel, is_bfloat16_supported
+from unsloth import is_bfloat16_supported
 
 
 def main():
@@ -51,7 +51,7 @@ def main():
 
     # Training
     trainer = ModelTrainer(model, tokenizer, dataset, data_collator, training_args)
-    stats = trainer.train()
+    trainer.train()
     trainer.save()
 
 

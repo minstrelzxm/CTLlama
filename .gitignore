@@ -2,3 +2,19 @@
 data/
 inference.ipynb
 dataset.ipynb
+
+# Secrets / env
+.env
+.env.local
+
+# Training artifacts
+cpt_output/
+output/
+grpo_saved_lora/
+lora_model/
+wandb/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
